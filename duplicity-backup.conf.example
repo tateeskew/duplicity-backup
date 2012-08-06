@@ -149,6 +149,15 @@ EMAIL_SUBJECT=
 MAIL="mailx"
 #MAIL="ssmtp"
 
+### MySQL Backup Setup ###                                                                                                                                                                                                                
+MUSER=""                                                                                                                                     
+MPASS=""                                                                                                                                 
+MHOST=""                                                                                                                                     
+
+### Disable MySQL Backup 
+#### Change to 0 to disable
+BACKUPMYSQL=1
+
 # TROUBLESHOOTING: If you are having any problems running this script it is
 # helpful to see the command output that is being generated to determine if the
 # script is causing a problem or if it is an issue with duplicity (or your

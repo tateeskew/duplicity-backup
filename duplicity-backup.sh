@@ -322,6 +322,40 @@ echo -e "--------    START DUPLICITY-BACKUP SCRIPT    --------\n" >> ${LOGFILE}
 
 get_lock
 
+backup_mysql() {
+# Dump MYSQL to /platform/storage_bkup/db
+
+if [[ "$BACKUPMYSQL" -gt 0 ]]; then
+    MYSQLBKUPDIR="/platform/storage_bkup/db"
+    MYSQL="$(which mysql)"
+    MYSQLDUMP="$(which mysqldump)"
+    GZIP="$(which gzip)"
+fi
+
+if [[ -n "$BACKUPMYSQL" && "$BACKUPMYSQL" -gt 0 ]]; then
+    if [[ -z "$MYSQL" || -z "$MYSQLDUMP" || -z "$GZIP" ]]; then
+        echo $MYSQL
+        echo $MYSQLDUMP
+        echo $GZIP
+        echo "Not all MySQL commands found."
+        exit 2
+    fi
+fi
+
+if [[ -n "$BACKUPMYSQL" && "$BACKUPMYSQL" -gt 0 ]]; then
+    # Get all databases name
+    DBS="$($MYSQL -u $MUSER -h $MHOST -p$MPASS -Bse 'show databases')"
+    for db in $DBS
+    do
+        if [ "$db" != "information_schema" ]; then
+        $MYSQLDUMP -u $MUSER -h $MHOST -p$MPASS $db | $GZIP -9 > $MYSQLBKUPDIR/mysql-$db.gz
+        fi
+    done
+fi
+
+# End Dump MYSQL
+}
+
 case "$1" in
   "--backup-script")
     backup_this_script
@@ -334,6 +368,10 @@ case "$1" in
     duplicity_backup
     duplicity_cleanup
     get_file_sizes
+  ;;
+
+  "--backup-mysql")
+    backup_mysql
   ;;
 
   "--verify")
